@@ -1,11 +1,33 @@
 @Library('keptn-library@5.0')_
 def keptn = new sh.keptn.Keptn()
 
+node {
+    properties([
+        parameters([
+         string(defaultValue: 'stage', description: 'Stage of your Keptn project where tests are triggered in', name: 'stage', trim: false), 
+         string(defaultValue: '', description: 'Keptn Context ID', name: 'shkeptncontext', trim: false), 
+         string(defaultValue: '', description: 'Triggered ID', name: 'triggeredid', trim: false), 
+        ])
+    ])
 
-// Initialize Keptn: "Link" it to your Jenkins Pipeline
-// -------------------------------------------
-// initialize keptn: will store project, service and stage in a local context file so you don't have to pass it to all other functions
-//
-// ⚠⚠⚠ keptn.keptnInit function is deprecated and will stop working once Keptn requires a git upstream repo when creating a project.
-// It is recommended to use the Keptn CLI/API for project creation.
-keptn.keptnInit project:"yourproject", service:"yourservice", stage:"yourstage"
+    def commit_id
+
+    stage('Preparation') {
+        checkout scm
+    }
+
+    stage('Initialize Keptn') {
+        keptn.keptnInit project:"sockshop", service:"carts", stage:"${params.stage}"
+    }
+
+    stage('Test') {
+        // Run your tests here
+    }
+
+    stage('Send Finished Event Back to Keptn') {
+        // Send test.finished Event back
+        def keptnContext = keptn.sendFinishedEvent eventType: "test", keptnContext: "${params.shkeptncontext}", triggeredId: "${params.triggeredid}", result:"pass", status:"succeeded", message:"jenkins tests succeeded"
+        String keptn_bridge = env.KEPTN_BRIDGE
+        echo "Open Keptns Bridge: ${keptn_bridge}/trace/${keptnContext}"
+    }
+}
