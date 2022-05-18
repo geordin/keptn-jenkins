@@ -6,10 +6,18 @@ def keptn = new sh.keptn.Keptn()
 // Initialize Keptn: "Link" it to your Jenkins Pipeline
 // -------------------------------------------
 // initialize keptn: will store project, service and stage in a local context file so you don't have to pass it to all other functions
+//
+// ⚠⚠⚠ keptn.keptnInit function is deprecated and will stop working once Keptn requires a git upstream repo when creating a project.
+// It is recommended to use the Keptn CLI/API for project creation.
 keptn.keptnInit project:"yourproject", service:"yourservice", stage:"yourstage"
+
+
 
 // initialize keptn with Shipyard: if a shipyard file is passed keptnInit will also make sure this project is created in Keptn
 // This allows you to automatically create a Keptn project for your Jenkins pipeline w/o having to do anything with Keptn directly
+//
+// ⚠⚠⚠ keptn.keptnInit function is deprecated and will stop working once Keptn requires a git upstream repo when creating a project.
+// It is recommended to use the Keptn CLI/API for project creation.
 keptn.keptnInit project:"yourproject", service:"yourservice", stage:"yourstage", shipyard:'shipyard.yaml'
 
 
@@ -35,6 +43,29 @@ keptn.keptnConfigureMonitoring monitoring:"dynatrace"
 // all keptn.send** functions have an optional parameter called labels. It is a way to pass custom labels to the sent event
 def labels=[:]
 labels.put('TriggeredBy', 'Andi')
+
+
+// Send Finished Event Use Case
+// ------------------------------------------
+// Send back a finished event to keptn for any triggered task which was handled by Jenkins
+// keptn.sendFinishedEvent functions have optional event type payload, depending on the type of an event
+
+// Example #1: Send a finished Event for a test task
+def eventTypePayload=[:]
+eventTypePayload.put('start', '2019-06-07T07:00:00.0000Z')
+eventTypePayload.put('end', '2019-06-07T08:00:00.0000Z')
+def keptnContext = keptn.sendFinishedEvent eventType: "test", keptnContext: "${params.shkeptncontext}", triggeredId: "${params.triggeredid}", result:"pass", status:"succeeded", eventTypePayload: eventTypePayload, lables: lables
+
+
+
+// Example #2: Send a finished Event for a deployment task
+// keptn.sendFinishedEvent functions have optional event type payload - example payload for keptn.sendFinishedEvent eventType: "deployment"
+def eventTypePayload=[:]
+eventTypePayload.put('deploymentstrategy', 'direct')
+eventTypePayload.put('deploymentURIsLocal', ['carts.sockshop-staging.svc.cluster.local','another.cartsUri.local'])
+def keptnContext = keptn.sendFinishedEvent eventType: "deployment", keptnContext: "${params.shkeptncontext}", triggeredId: "${params.triggeredid}", result:"pass", status:"succeeded", eventTypePayload: eventTypePayload, lables: lables
+
+
 
 // Quality Gate Evaluation Use Case
 // ------------------------------------------
