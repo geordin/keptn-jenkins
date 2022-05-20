@@ -1,4 +1,4 @@
-@Library('keptn-library@6.1.0')_
+@Library('keptn-library@5.1')_
 def keptn = new sh.keptn.Keptn()
 
 node {
