@@ -2,10 +2,11 @@
 import sh.keptn.Keptn
 def keptn = new sh.keptn.Keptn()
 
-keptn.keptnInit project:"sockshop", service:"carts", stage:"dev"
+
 
 node {
   stage('Trigger Delivery') {
+  keptn.keptnInit project:"sockshop", service:"carts", stage:"dev"
   echo "Progressive Delivery: Triggering Keptn to deliver ${params.Image}"
   
   def keptnContext = keptn.sendDeliveryTriggeredEvent image:"docker.io/keptnexamples/carts:0.13.3"
