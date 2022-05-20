@@ -2,7 +2,8 @@
 import sh.keptn.Keptn
 def keptn = new sh.keptn.Keptn()
 
-
+node {
+  stage('Trigger Delivery') {
 // Initialize Keptn: "Link" it to your Jenkins Pipeline
 // -------------------------------------------
 // initialize keptn: will store project, service and stage in a local context file so you don't have to pass it to all other functions
@@ -20,3 +21,5 @@ echo "Open Keptns Bridge: ${keptn_bridge}/trace/${keptnContext}"
 // --------------------------------------------
 def result = keptn.waitForEvaluationDoneEvent setBuildResult:true, waitTime:5
 echo "${result}"
+  }
+}
