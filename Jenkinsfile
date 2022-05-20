@@ -4,22 +4,19 @@ def keptn = new sh.keptn.Keptn()
 node {
     properties([
         parameters([
-         string(defaultValue: 'qgproject', description: 'Name of your Keptn Project for Quality Gate Feedback ', name: 'Project', trim: false), 
-         string(defaultValue: 'qualitystage', description: 'Stage in your Keptn project used for for Quality Gate Feedback', name: 'Stage', trim: false), 
-         string(defaultValue: 'evalservice', description: 'Servicename used to keep SLIs and SLOs', name: 'Service', trim: false),
-         choice(choices: ['dynatrace', 'prometheus',''], description: 'Select which monitoring tool should be configured as SLI provider', name: 'Monitoring', trim: false),
-         choice(choices: ['basic', 'perftest'], description: 'Decide which set of SLIs you want to evaluate. The sample comes with: basic and perftest', name: 'SLI'),
-         string(defaultValue: '660', description: 'Start timestamp or number of seconds from Now()', name: 'StartTime', trim: false),
-         string(defaultValue: '60', description: 'End timestamp or number of seconds from Now(). If empty defaults to Now()', name: 'EndTime', trim: false),
-         string(defaultValue: '3', description: 'How many minutes to wait until Keptn is done? 0 to not wait', name: 'WaitForResult'),
+         string(defaultValue: 'simpleproject', description: 'Name of your Keptn Project you have setup for progressive delivery', name: 'Project', trim: false), 
+         string(defaultValue: 'staging', description: 'First stage you want to deploy into', name: 'Stage', trim: false), 
+         string(defaultValue: 'simplenode', description: 'Name of the service you provide a configuration change for', name: 'Service', trim: false),
+         string(defaultValue: 'docker.io/grabnerandi/simplenodeservice:2.0.0', description: 'Name of the service you provide a configuration change for', name: 'Image', trim: false),
+         string(defaultValue: '60', description: 'How many minutes to wait until Keptn is done? 0 to not wait', name: 'WaitForResult'),
         ])
     ])
 
-    stage('Trigger Quality Gate') {
-        echo "Quality Gates ONLY: Just triggering an SLI/SLO-based evaluation for the passed timeframe"
+    stage('Trigger Delivery') {
+        echo "Progressive Delivery: Triggering Keptn to deliver ${params.Image}"
 
-        // Trigger an evaluation
-        def keptnContext = keptn.sendStartEvaluationEvent starttime:"${params.StartTime}", endtime:"${params.EndTime}" 
+        // send deployment finished to trigger tests
+        def keptnContext = keptn.sendConfigurationChangedEvent project:"${params.Project}", service:"${params.Service}", stage:"${params.Stage}", image:"${params.Image}" 
         String keptn_bridge = env.KEPTN_BRIDGE
         echo "Open Keptns Bridge: ${keptn_bridge}/trace/${keptnContext}"
     }
