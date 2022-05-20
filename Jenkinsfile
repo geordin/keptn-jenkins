@@ -1,4 +1,4 @@
-@Library('keptn-library@3.5')
+@Library('keptn-library@6.0.0')
 import sh.keptn.Keptn
 def keptn = new sh.keptn.Keptn()
 
@@ -17,7 +17,7 @@ node {
         echo "Progressive Delivery: Triggering Keptn to deliver ${params.Image}"
 
         // send deployment finished to trigger tests
-        def keptnContext = keptn.sendConfigurationChangedEvent project:"${params.Project}", service:"${params.Service}", stage:"${params.Stage}", image:"${params.Image}" 
+        def keptnContext = keptn.sendDeliveryTriggeredEvent project:"${params.Project}", service:"${params.Service}", stage:"${params.Stage}", image:"${params.Image}" 
         String keptn_bridge = env.KEPTN_BRIDGE
         echo "Open Keptns Bridge: ${keptn_bridge}/trace/${keptnContext}"
     }
