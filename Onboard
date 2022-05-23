@@ -1,0 +1,28 @@
+@Library('keptn-library@6.0.0')
+import sh.keptn.Keptn
+def keptn = new sh.keptn.Keptn()
+
+
+node {
+  
+  properties([
+        parameters([
+         string(defaultValue: 'sockshop', description: 'Name of your Keptn Project you have setup for progressive delivery', name: 'Project', trim: false), 
+         string(defaultValue: 'dev', description: 'First stage you want to deploy into', name: 'Stage', trim: false), 
+         string(defaultValue: 'carts', description: 'Name of the service you provide a configuration change for', name: 'Service', trim: false),
+         string(defaultValue: 'docker.io/keptnexamples/carts:0.13.3', description: 'Name of the service you provide a configuration change for', name: 'Image', trim: false),
+         string(defaultValue: '60', description: 'How many minutes to wait until Keptn is done? 0 to not wait', name: 'WaitForResult'),
+        ])
+    ])
+    
+    stage('Initialize Keptn') {
+        keptn.downloadFile("https://raw.githubusercontent.com/keptn-sandbox/performance-testing-as-selfservice-tutorial/master/shipyard.yaml", 'shipyard.yaml')
+        keptn.downloadFile("https://raw.githubusercontent.com/keptn-sandbox/jenkins-tutorial/master/usecases/uc1_qualitygates/keptn/slo_${params.SLI}.yaml", 'keptn/slo.yaml')
+        keptn.downloadFile("https://raw.githubusercontent.com/keptn-sandbox/jenkins-tutorial/master/usecases/uc1_qualitygates/keptn/dynatrace/sli_${params.SLI}.yaml", 'keptn/sli.yaml')
+
+        // Initialize the Keptn Project - ensures the Keptn Project is created with the passed shipyard
+        keptn.keptnInit project:"${params.Project}", service:"${params.Service}", stage:"${params.Stage}", monitoring:"${monitoring}", shipyard:'shipyard.yaml'
+
+        keptn.keptnAddResources('keptn/sli.yaml','dynatrace/sli.yaml')
+        keptn.keptnAddResources('keptn/slo.yaml','slo.yaml')
+    }
